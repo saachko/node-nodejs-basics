@@ -5,6 +5,10 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const throwCustomError = () => {
+  throw new Error('FS operation failed');
+};
+
 const copy = async () => {
   const folderPath = path.resolve(__dirname, './files');
   const copyFolderPath = path.resolve(__dirname, './files_copy');
@@ -12,15 +16,15 @@ const copy = async () => {
   try {
     await fs.access(folderPath, fs.constants.F_OK);
   } catch (error) {
-    throw new Error('FS operation failed');
+    throwCustomError();
   }
 
   try {
     await fs.access(copyFolderPath, fs.constants.F_OK);
-    throw new Error('FS operation failed');
+    throwCustomError();
   } catch (error) {
     if (error.code !== 'ENOENT') {
-      throw new Error('FS operation failed');
+      throwCustomError();
     }
   }
 
