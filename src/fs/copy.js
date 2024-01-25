@@ -1,5 +1,37 @@
+import fs from 'node:fs/promises';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const copy = async () => {
-    // Write your code here 
+  const folderPath = path.resolve(__dirname, './files');
+  const copyFolderPath = path.resolve(__dirname, './files_copy');
+
+  try {
+    await fs.access(folderPath, fs.constants.F_OK);
+  } catch (error) {
+    throw new Error('FS operation failed');
+  }
+
+  try {
+    await fs.access(copyFolderPath, fs.constants.F_OK);
+    throw new Error('FS operation failed');
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw new Error('FS operation failed');
+    }
+  }
+
+  await fs.mkdir(copyFolderPath, { recursive: true });
+
+  const files = await fs.readdir(folderPath);
+  files.map(async (file) => {
+    const filePath = path.join(folderPath, file);
+    const copyFilePath = path.join(copyFolderPath, file);
+    await fs.copyFile(filePath, copyFilePath);
+  });
 };
 
 await copy();
