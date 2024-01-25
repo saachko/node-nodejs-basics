@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -10,15 +9,16 @@ const create = async () => {
   const content = 'I am fresh and young';
   const filePath = path.resolve(__dirname, './files/fresh.txt');
 
-  if (existsSync(filePath)) {
+  try {
+    await fs.access(filePath, fs.constants.F_OK);
     throw new Error('FS operation failed');
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw new Error('FS operation failed');
+    }
   }
 
-  try {
-    await fs.writeFile(filePath, content);
-  } catch (error) {
-    throw new Error('FS operation failed');
-  }
+  await fs.writeFile(filePath, content);
 };
 
 await create();
