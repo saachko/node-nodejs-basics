@@ -1,6 +1,7 @@
 import { createReadStream, createWriteStream } from 'fs';
 import { createGzip } from 'zlib';
 import { fileURLToPath } from 'url';
+import fs from 'node:fs/promises';
 import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +14,7 @@ const compress = async () => {
   const writeStream = createWriteStream(compressedFile);
   const gzip = createGzip();
   readStream.pipe(gzip).pipe(writeStream);
+  await fs.rm(fileToCompress);
 };
 
 await compress();
